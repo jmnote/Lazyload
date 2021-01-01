@@ -7,17 +7,6 @@ $.fn.lazyload = function(options) {
     var elements = this;
     var timer;
 
-    function replaceHost(url) {
-        var host = mw.config.get('Lazyload.imageHost');
-        if (!host) {
-            return url;
-        }
-        if (host.indexOf('//') === -1) {
-            host = '//' + host;
-        }
-        return url.replace(/(https?:)?\/\/[^\s\/]+/g, host);
-    }
-
     function update() {
         clearTimeout(timer);
         timer = setTimeout(function () {
@@ -45,28 +34,8 @@ $.fn.lazyload = function(options) {
                         $this.html(img);
                     }
                     img.hide()[opt.effect]();
-                    if ($this.hasClass('apng') && window.APNG) {
-                       APNG.ifNeeded().then(function () {
-                           APNG.animateImage(img.get(0));
-                       });
-                    }
                 });
-
-                img.attr('src', replaceHost($this.data('url')));
-                if (img.data('srcset') && !mw.config.get('Lazyload.disableHidpi')) {
-                    img.attr('srcset', replaceHost(img.data('srcset')));
-                    var testImage = new Image();
-
-                    if (window.devicePixelRatio > 1 && testImage.srcset === undefined) {
-                        var srcset = img.attr('srcset'), match;
-                        if (typeof srcset === 'string' && srcset !== '') {
-                            match = $.matchSrcSet(devicePixelRatio, srcset);
-                            if (match !== null) {
-                                img.attr('src', match);
-                            }
-                        }
-                    }
-                }
+                img.attr('src', $this.data('url'));
             }
 
             elements = $($.grep(elements, function(element) {
